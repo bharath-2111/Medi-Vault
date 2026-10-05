@@ -44,12 +44,16 @@ def get_current_user(
         )
 
         data = payload.get("sub")
-
+        if not data:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid payload"
+            )
         try:
             user_id = UUID(data)
         except (ValueError,TypeError):
             raise HTTPException(
-                status_code=400,
+                status_code=401,
                 detail="Invalid user id"
             )
         user = session.exec(
@@ -98,7 +102,7 @@ def register_patient(det : PatientRegisterForm , session : Session = Depends(get
 
         patient = Patient(
             user_id=user.id,
-            date_of_birth=datetime.strptime(det.date_of_birth, "%Y-%m-%d").date(),
+            date_of_birth=det.date_of_birth,
             gender=det.gender,
             blood_group=det.blood_group,
             phone_no=det.phone_no,
@@ -193,3 +197,10 @@ def login(
         "message": "Logined Successfully",
         "token" : token
     }
+
+
+@router.get("/me")
+def get_user_info(
+    curr_user : Annotated[User,Depends(get_current_user)]
+):
+    return curr_user

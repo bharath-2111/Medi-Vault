@@ -5,7 +5,7 @@ class PatientRegisterForm(BaseModel):
     username : str
     email : str
     password : str
-    date_of_birth : str
+    date_of_birth : date
     blood_group : str
     gender : str
     phone_no : str
